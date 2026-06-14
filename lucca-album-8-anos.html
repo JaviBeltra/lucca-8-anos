@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El álbum de Lucca</title>
+<style>
+  :root{
+    --celeste:#74ACDF;
+    --celeste-claro:#EAF3FC;
+    --azul-oscuro:#0B3D7A;
+    --papel:#FBF7EE;
+    --papel-borde:#E4DCC8;
+    --dorado:#D4A24E;
+    --rojo:#D8453A;
+    --verde:#3FA34D;
+    --texto:#222222;
+    --texto-suave:#5B5B5B;
+  }
+
+  *{box-sizing:border-box;}
+
+  body{
+    margin:0;
+    font-family:'Archivo Black','Arial Black',sans-serif;
+    background:var(--papel);
+    color:var(--texto);
+  }
+
+  .album{
+    max-width:640px;
+    margin:0 auto;
+    min-height:100vh;
+    background:
+      repeating-linear-gradient(135deg, rgba(116,172,223,0.05) 0px, rgba(116,172,223,0.05) 2px, transparent 2px, transparent 24px),
+      var(--papel);
+    padding:0 0 60px;
+    position:relative;
+  }
+
+  /* ---------- PORTADA ---------- */
+  .portada{
+    background:linear-gradient(180deg, var(--celeste) 0%, var(--celeste) 55%, var(--papel) 55%);
+    padding:32px 24px 40px;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+  }
+
+  .portada::before{
+    content:"";
+    position:absolute;
+    top:0; left:0; right:0; height:8px;
+    background:repeating-linear-gradient(90deg, var(--papel) 0 10px, var(--celeste) 10px 20px);
+  }
+
+  .sello{
+    display:inline-block;
+    background:var(--dorado);
+    color:#fff;
+    font-size:11px;
+    letter-spacing:2px;
+    padding:6px 14px;
+    border-radius:999px;
+    margin-bottom:18px;
+    text-transform:uppercase;
+    font-family:Arial, sans-serif;
+    font-weight:700;
+  }
+
+  .titulo-album{
+    font-size:13px;
+    letter-spacing:6px;
+    color:#fff;
+    text-transform:uppercase;
+    margin:0;
+    font-family:Arial, sans-serif;
+    font-weight:700;
+    opacity:0.85;
+  }
+
+  .nombre-jugador{
+    font-size:54px;
+    line-height:1.05;
+    color:#fff;
+    margin:10px 0 4px;
+    text-shadow:3px 3px 0 var(--azul-oscuro);
+    letter-spacing:2px;
+  }
+
+  .dorsal{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:90px;
+    height:90px;
+    border-radius:50%;
+    background:#fff;
+    color:var(--azul-oscuro);
+    font-size:48px;
+    border:6px solid var(--dorado);
+    margin:18px auto 0;
+    box-shadow:inset 0 0 0 3px var(--celeste-claro);
+  }
+
+  .subtitulo-portada{
+    margin:18px auto 0;
+    max-width:380px;
+    font-family:Arial, sans-serif;
+    font-weight:400;
+    font-size:15px;
+    line-height:1.6;
+    color:var(--azul-oscuro);
+    background:rgba(255,255,255,0.55);
+    padding:14px 18px;
+    border-radius:12px;
+    border:1px dashed var(--celeste);
+  }
+
+  /* ---------- INSTRUCCION ---------- */
+  .instruccion{
+    text-align:center;
+    font-family:Arial, sans-serif;
+    font-weight:400;
+    font-size:13px;
+    color:var(--texto-suave);
+    padding:18px 24px 4px;
+    line-height:1.6;
+  }
+
+  /* ---------- GRILLA DE FIGURITAS ---------- */
+  .grilla{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:14px;
+    padding:18px;
+  }
+
+  @media (max-width:420px){
+    .grilla{grid-template-columns:repeat(2, 1fr);}
+  }
+
+  .figurita{
+    aspect-ratio:3/4;
+    background:var(--celeste-claro);
+    border:3px solid var(--celeste);
+    border-radius:10px;
+    position:relative;
+    cursor:pointer;
+    overflow:hidden;
+    transition:transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .figurita:hover{
+    transform:translateY(-3px);
+    box-shadow:0 6px 0 rgba(11,61,122,0.15);
+  }
+
+  .figurita .fondo-foto{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+  }
+
+  .figurita .numero-fondo{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:34px;
+    color:var(--azul-oscuro);
+    line-height:1;
+  }
+
+  .figurita .degradado{
+    position:absolute;
+    left:0; right:0; bottom:0;
+    height:48%;
+    background:linear-gradient(180deg, transparent 0%, rgba(11,61,122,0.78) 100%);
+    pointer-events:none;
+  }
+
+  .figurita .pie-figurita{
+    position:absolute;
+    left:8px; right:8px; bottom:6px;
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+  }
+
+  .figurita .pie-numero{
+    font-size:24px;
+    color:#fff;
+    text-shadow:1px 1px 0 rgba(11,61,122,0.6);
+  }
+
+  .figurita.placeholder .pie-numero{
+    color:var(--azul-oscuro);
+    text-shadow:none;
+  }
+
+  .figurita .pie-edad{
+    font-family:Arial, sans-serif;
+    font-weight:700;
+    font-size:9px;
+    letter-spacing:1px;
+    color:#fff;
+    text-transform:uppercase;
+    text-shadow:1px 1px 0 rgba(11,61,122,0.6);
+  }
+
+  .figurita.placeholder .pie-edad{
+    color:var(--texto-suave);
+    text-shadow:none;
+  }
+
+  .figurita .estrellita{
+    position:absolute;
+    top:6px;
+    right:8px;
+    font-size:14px;
+    color:var(--dorado);
+    z-index:2;
+  }
+
+  .figurita.final{
+    border-color:var(--dorado);
+    background:linear-gradient(135deg, #fff 0%, #FFF6E6 100%);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+  }
+
+  .figurita.final .copa{
+    font-size:26px;
+    margin-bottom:4px;
+  }
+
+  .figurita.final .pie-edad{
+    position:static;
+    color:var(--texto-suave);
+    text-shadow:none;
+  }
+
+  /* ---------- PESTAÑA / DETALLE ---------- */
+  .overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(11,61,122,0.55);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    z-index:50;
+  }
+
+  .overlay.activo{display:flex;}
+
+  .ficha{
+    background:var(--papel);
+    border-radius:16px;
+    max-width:420px;
+    width:100%;
+    max-height:88vh;
+    overflow-y:auto;
+    padding:0;
+    border:4px solid var(--celeste);
+    position:relative;
+  }
+
+  .ficha-header{
+    background:var(--celeste);
+    padding:18px 50px 16px 18px;
+    position:relative;
+  }
+
+  .ficha-header .anio-grande{
+    font-size:28px;
+    color:#fff;
+    margin:0;
+    text-shadow:2px 2px 0 var(--azul-oscuro);
+  }
+
+  .ficha-header .edad{
+    font-family:Arial, sans-serif;
+    font-weight:700;
+    font-size:12px;
+    letter-spacing:1px;
+    color:var(--azul-oscuro);
+    text-transform:uppercase;
+    margin-top:4px;
+  }
+
+  .cerrar{
+    position:absolute;
+    top:12px;
+    right:12px;
+    width:32px;
+    height:32px;
+    border-radius:50%;
+    background:#fff;
+    border:none;
+    font-size:18px;
+    color:var(--azul-oscuro);
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:Arial, sans-serif;
+    font-weight:700;
+  }
+
+  .ficha-cuerpo{
+    padding:18px;
+  }
+
+  .marco-foto{
+    width:100%;
+    aspect-ratio:4/3;
+    background:#fff;
+    border:2px dashed var(--celeste);
+    border-radius:10px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    font-family:Arial, sans-serif;
+    color:var(--texto-suave);
+    font-size:13px;
+    text-align:center;
+    padding:10px;
+    margin-bottom:14px;
+    overflow:hidden;
+  }
+
+  .marco-foto img, .marco-foto video{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    border-radius:8px;
+  }
+
+  .marco-foto .icono-camara{
+    font-size:26px;
+    margin-bottom:6px;
+  }
+
+  /* ---------- FICHA FINAL ---------- */
+  .ficha-header.final-header{
+    background:var(--dorado);
+  }
+
+  .ficha-header.final-header .anio-grande,
+  .ficha-header.final-header .edad{
+    text-shadow:2px 2px 0 #7a4f0c;
+    color:#fff;
+  }
+
+  .video-final{
+    width:100%;
+    aspect-ratio:9/16;
+    max-height:480px;
+    background:#fff;
+    border:2px dashed var(--dorado);
+    border-radius:10px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    font-family:Arial, sans-serif;
+    color:var(--texto-suave);
+    font-size:13px;
+    text-align:center;
+    padding:10px;
+    margin-bottom:14px;
+    overflow:hidden;
+  }
+
+  .video-final video{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    border-radius:8px;
+  }
+
+  .mensaje-final{
+    text-align:center;
+    font-size:22px;
+    color:var(--azul-oscuro);
+    margin:0 0 12px;
+    text-shadow:2px 2px 0 rgba(212,162,78,0.4);
+  }
+
+  /* ---------- PIE ---------- */
+  .pie{
+    text-align:center;
+    font-family:Arial, sans-serif;
+    font-size:11px;
+    color:var(--texto-suave);
+    padding:20px 24px 0;
+    line-height:1.6;
+  }
+</style>
+</head>
+<body>
+
+<div class="album">
+
+  <div class="portada">
+    <span class="sello">Edición especial</span>
+    <p class="titulo-album">Álbum de</p>
+    <h1 class="nombre-jugador">LUCCA</h1>
+    <div class="dorsal">8</div>
+    <p class="subtitulo-portada">
+      Tocá cada figurita para descubrir una foto, un video o un audio de papá contando esa parte de tu historia. ¡Feliz cumpleaños, campeón!
+    </p>
+  </div>
+
+  <p class="instruccion">Recorré el álbum completo, año por año, y no te olvides de llegar hasta la última figurita ⭐</p>
+
+  <div class="grilla" id="grilla">
+    <!-- Las figuritas se generan con JS -->
+  </div>
+
+  <p class="pie">
+    Hecho con cariño desde Argentina para Lucca, en Bruselas.<br>
+    Selección Argentina · Mundial 2026
+  </p>
+
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="ficha" id="ficha"></div>
+</div>
+
+<script>
+  // ---------------------------------------------------------------
+  // CONTENIDO DEL ÁLBUM
+  // Para completar: poner la ruta del video correspondiente a cada
+  // año. Dejar en "" lo que todavía no se tenga.
+  //
+  //  video: ruta o URL a un video corto (mp4) grabado por papá
+  //         contando esa parte de la historia de Lucca
+  // ---------------------------------------------------------------
+
+  const anios = [
+    { anio:0, edad:"recién nacido", foto:"fotos/anio0.jpg", video:"" },
+    { anio:1, edad:"1 año",          foto:"", video:"" },
+    { anio:2, edad:"2 años",         foto:"", video:"" },
+    { anio:3, edad:"3 años",         foto:"", video:"videos/anio3.mp4" },
+    { anio:4, edad:"4 años",         foto:"", video:"" },
+    { anio:5, edad:"5 años",         foto:"", video:"" },
+    { anio:6, edad:"6 años",         foto:"", video:"" },
+    { anio:7, edad:"7 años",         foto:"", video:"" },
+  ];
+
+  // Mensaje y video de cierre (hoy, 8 años)
+  const final = {
+    edad:"hoy, 8 años",
+    video:"videos/final.mp4",     // ruta o URL al video final grabado por papá
+    mensaje:"¡Feliz cumpleaños, Lucca!"
+  };
+
+  // ---------------------------------------------------------------
+
+  const grilla = document.getElementById('grilla');
+  const overlay = document.getElementById('overlay');
+  const ficha = document.getElementById('ficha');
+
+  anios.forEach(item => {
+    const div = document.createElement('div');
+    const tieneFoto = !!item.foto;
+    div.className = 'figurita' + (tieneFoto ? '' : ' placeholder');
+
+    const fondoHTML = tieneFoto
+      ? `<img class="fondo-foto" src="${item.foto}" alt="Lucca - ${item.edad}">`
+      : `<div class="numero-fondo">${item.anio}</div>`;
+
+    const degradadoHTML = tieneFoto ? `<div class="degradado"></div>` : '';
+
+    div.innerHTML = `
+      <span class="estrellita">★</span>
+      ${fondoHTML}
+      ${degradadoHTML}
+      <div class="pie-figurita">
+        <span class="pie-numero">${item.anio}</span>
+        <span class="pie-edad">${item.edad}</span>
+      </div>
+    `;
+    div.addEventListener('click', () => abrirFicha(item));
+    grilla.appendChild(div);
+  });
+
+  // Figurita final
+  const divFinal = document.createElement('div');
+  divFinal.className = 'figurita final';
+  divFinal.innerHTML = `
+    <span class="copa">🏆</span>
+    <span class="pie-edad">${final.edad}</span>
+  `;
+  divFinal.addEventListener('click', abrirFinal);
+  grilla.appendChild(divFinal);
+
+  function abrirFicha(item){
+    let videoHTML = `
+      <div class="marco-foto">
+        <span class="icono-camara">🎬</span>
+        Acá va el video de cuando Lucca tenía ${item.edad}
+      </div>`;
+
+    if(item.video){
+      videoHTML = `<div class="marco-foto"><video controls autoplay playsinline src="${item.video}"></video></div>`;
+    }
+
+    ficha.innerHTML = `
+      <div class="ficha-header">
+        <button class="cerrar" id="cerrarBtn">✕</button>
+        <h2 class="anio-grande">Figurita Nº ${item.anio + 1}</h2>
+        <div class="edad">${item.edad}</div>
+      </div>
+      <div class="ficha-cuerpo">
+        ${videoHTML}
+      </div>
+    `;
+
+    document.getElementById('cerrarBtn').addEventListener('click', cerrarFicha);
+    overlay.classList.add('activo');
+  }
+
+  function abrirFinal(){
+    let videoHTML = `
+      <div class="video-final">
+        <span class="icono-camara">🎬</span>
+        Acá va el video de papá para Lucca
+      </div>`;
+
+    if(final.video){
+      videoHTML = `<div class="video-final"><video controls autoplay playsinline src="${final.video}"></video></div>`;
+    }
+
+    ficha.innerHTML = `
+      <div class="ficha-header final-header">
+        <button class="cerrar" id="cerrarBtn">✕</button>
+        <h2 class="anio-grande">Figurita final</h2>
+        <div class="edad">${final.edad}</div>
+      </div>
+      <div class="ficha-cuerpo">
+        <h2 class="mensaje-final">${final.mensaje}</h2>
+        ${videoHTML}
+      </div>
+    `;
+
+    document.getElementById('cerrarBtn').addEventListener('click', cerrarFicha);
+    overlay.classList.add('activo');
+  }
+
+  function cerrarFicha(){
+    overlay.classList.remove('activo');
+  }
+
+  overlay.addEventListener('click', (e) => {
+    if(e.target === overlay) cerrarFicha();
+  });
+</script>
+
+</body>
+</html>
